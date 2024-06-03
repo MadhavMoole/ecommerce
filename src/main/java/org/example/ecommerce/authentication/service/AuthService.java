@@ -25,12 +25,12 @@ public class AuthService implements IAuthService{
     @Override
     public ResponseEntity<String> createUser(RegistrationDTO registrationDTO) {
 
-        if(userRepository.findByUsername(registrationDTO.userName()) != null) {
+        if(userRepository.findByUsername(registrationDTO.userName()).isPresent()) {
             logger.error("AuthService => createUser => Error: User Already exists");
             return new ResponseEntity<>("User Already exists", HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.findByEmail(registrationDTO.email()) != null) {
+        if(userRepository.findByEmail(registrationDTO.email()).isPresent()) {
             logger.error("AuthService => createUser => Error: Email Already taken");
             return new ResponseEntity<>("Email Already taken", HttpStatus.BAD_REQUEST);
         }
@@ -46,9 +46,10 @@ public class AuthService implements IAuthService{
             logger.info("AuthService => createUser => User created");
             return new ResponseEntity<>("User created", HttpStatus.CREATED);
         } catch (DataAccessException e) {
-            logger.error("AuthService => createUser => Error: " + e.getMessage());
+            logger.error("AuthService => createUser => Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user");
         }
+
     }
 
 }
