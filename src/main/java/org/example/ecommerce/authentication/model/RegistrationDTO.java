@@ -7,5 +7,4 @@ public record RegistrationDTO(
         String password,
         String userName
 ) {
-
 }
