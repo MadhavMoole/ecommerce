@@ -3,6 +3,7 @@ package org.example.ecommerce.authentication.service;
 import org.example.ecommerce.authentication.model.RegistrationDTO;
 import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.repository.UserRepository;
+import org.example.ecommerce.utils.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,16 @@ public class AuthService implements IAuthService{
 
     @Override
     public ResponseEntity<String> createUser(RegistrationDTO registrationDTO) {
+
+        if(!Validator.isValidEmail(registrationDTO.email())) {
+            logger.error("AuthService => createUser => Error: Invalid Email");
+            return new ResponseEntity<>("Invalid Email", HttpStatus.BAD_REQUEST);
+        }
+
+        if(!Validator.isValidPassword(registrationDTO.password())) {
+            logger.error("AuthService => createUser => Error: Invalid Password");
+            return new ResponseEntity<>("Invalid Password", HttpStatus.BAD_REQUEST);
+        }
 
         if(userRepository.findByUsername(registrationDTO.userName()).isPresent()) {
             logger.error("AuthService => createUser => Error: User Already exists");
@@ -49,7 +60,6 @@ public class AuthService implements IAuthService{
             logger.error("AuthService => createUser => Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user");
         }
-
     }
 
 }
