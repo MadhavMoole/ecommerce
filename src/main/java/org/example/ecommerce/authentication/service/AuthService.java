@@ -32,7 +32,7 @@ public class AuthService implements IAuthService{
     //endregion
 
     @Autowired
-    public void setJwtUtil(JWTService jwtService) {
+    public void setJwtService(JWTService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -111,4 +111,5 @@ public class AuthService implements IAuthService{
         return new AuthServiceResponse<>(HttpStatus.OK, "User logged in", loginResponseDTO);
     }
     //endregion
+
 }
