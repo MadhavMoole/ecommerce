@@ -8,7 +8,7 @@ import org.example.ecommerce.authentication.model.Registration.RegistrationRespo
 import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.repository.UserRepository;
 import org.example.ecommerce.utils.EncryptionService;
-import org.example.ecommerce.utils.JWTUtil;
+import org.example.ecommerce.utils.JWTService;
 import org.example.ecommerce.utils.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +24,12 @@ public class AuthService implements IAuthService{
 
     private UserRepository userRepository;
     private EncryptionService encryptionService;
-    private JWTUtil jwtUtil;
+    private JWTService jwtService;
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public void setJwtUtil(JWTUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    @Autowired
+    public void setJwtUtil(JWTService jwtService) {
+        this.jwtService = jwtService;
     }
 
     @Autowired
@@ -52,7 +53,7 @@ public class AuthService implements IAuthService{
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Invalid Password", null);
         }
 
-        if(userRepository.findByUsername(registrationRequestDTO.userName()).isPresent()) {
+        if(userRepository.findByUsername(registrationRequestDTO.username()).isPresent()) {
             logger.error("AuthService => createUser => Error: User Already exists");
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "User Already Exists", null);
         }
@@ -64,15 +65,15 @@ public class AuthService implements IAuthService{
 
         try {
             User user = new User();
-            user.setUsername(registrationRequestDTO.userName());
-            user.setFirstName(registrationRequestDTO.firstName());
-            user.setLastName(registrationRequestDTO.lastName());
+            user.setUsername(registrationRequestDTO.username());
+            user.setFirstName(registrationRequestDTO.firstname());
+            user.setLastName(registrationRequestDTO.lastname());
             user.setEmail(registrationRequestDTO.email());
             user.setPassword(encryptionService.encrypt(registrationRequestDTO.password()));
             userRepository.save(user);
 
             // Generate JWT token on registration
-            String jwt = jwtUtil.generateJWT(user);
+            String jwt = jwtService.generateJWT(user);
             RegistrationResponseDTO registrationResponseDTO = new RegistrationResponseDTO(jwt, user.getUsername(), user.getEmail());
 
             logger.info("AuthService => createUser => User created");
@@ -97,7 +98,7 @@ public class AuthService implements IAuthService{
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Incorrect password", null);
         }
 
-        String jwt = jwtUtil.generateJWT(user);
+        String jwt = jwtService.generateJWT(user);
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwt, user.getUsername(), user.getEmail());
         logger.info("AuthService => login => User logged in successfully");
         return new AuthServiceResponse<>(HttpStatus.OK, "User logged in", loginResponseDTO);

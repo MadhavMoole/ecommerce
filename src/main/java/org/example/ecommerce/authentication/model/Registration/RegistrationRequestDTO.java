@@ -1,10 +1,10 @@
 package org.example.ecommerce.authentication.model.Registration;
 
 public record RegistrationRequestDTO(
-        String firstName,
-        String lastName,
+        String firstname,
+        String lastname,
         String email,
         String password,
-        String userName
+        String username
 ) {
 }

@@ -31,10 +31,10 @@ public class User {
         private String email;
 
         @Column(name = "first_name", nullable = false)
-        private String firstName;
+        private String firstname;
 
         @Column(name = "last_name", nullable = false)
-        private String lastName;
+        private String lastname;
 
         @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
         private List<Address> addresses = new ArrayList<>();
@@ -48,19 +48,19 @@ public class User {
         }
 
         public String getLastName() {
-                return lastName;
+                return lastname;
         }
 
-        public void setLastName(String lastName) {
-                this.lastName = lastName;
+        public void setLastName(String lastname) {
+                this.lastname = lastname;
         }
 
         public String getFirstName() {
-                return firstName;
+                return firstname;
         }
 
-        public void setFirstName(String firstName) {
-                this.firstName = firstName;
+        public void setFirstName(String firstname) {
+                this.firstname = firstname;
         }
 
         public String getEmail() {
