@@ -5,10 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.annotation.PostConstruct;
 import org.example.ecommerce.database.models.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-public class JWTUtil {
+@Service
+public class JWTService {
 
     @Value("${jwt.algorithm.key}")
     private String key;
