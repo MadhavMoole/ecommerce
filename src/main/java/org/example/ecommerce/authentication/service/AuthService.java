@@ -1,5 +1,6 @@
 package org.example.ecommerce.authentication.service;
 
+//region imports
 import org.example.ecommerce.authentication.model.AuthServiceResponse;
 import org.example.ecommerce.authentication.model.Login.LoginRequestDTO;
 import org.example.ecommerce.authentication.model.Login.LoginResponseDTO;
@@ -9,7 +10,7 @@ import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.repository.UserRepository;
 import org.example.ecommerce.utils.EncryptionService;
 import org.example.ecommerce.utils.JWTService;
-import org.example.ecommerce.utils.Validator;
+import org.example.ecommerce.utils.ValidatationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+//endregion
 
 @Service
 public class AuthService implements IAuthService{
 
+    //region declaration
     private UserRepository userRepository;
     private EncryptionService encryptionService;
     private JWTService jwtService;
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
+    //endregion
 
     @Autowired
     public void setJwtUtil(JWTService jwtService) {
@@ -40,15 +44,16 @@ public class AuthService implements IAuthService{
     @Autowired
     public void setEncryptionService(EncryptionService encryptionService) {this.encryptionService = encryptionService;}
 
+    //region register
     @Override
     public AuthServiceResponse<RegistrationResponseDTO> registerUser(RegistrationRequestDTO registrationRequestDTO) {
 
-        if(!Validator.isValidEmail(registrationRequestDTO.email())) {
+        if(!ValidatationService.isValidEmail(registrationRequestDTO.email())) {
             logger.error("AuthService => createUser => Error: Invalid Email");
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Invalid Email", null);
         }
 
-        if(!Validator.isValidPassword(registrationRequestDTO.password())) {
+        if(!ValidatationService.isValidPassword(registrationRequestDTO.password())) {
             logger.error("AuthService => createUser => Error: Invalid Password");
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Invalid Password", null);
         }
@@ -83,7 +88,9 @@ public class AuthService implements IAuthService{
             return new AuthServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
+    //endregion
 
+    //region login
     @Override
     public AuthServiceResponse<LoginResponseDTO> loginUser(LoginRequestDTO loginRequestDTO) {
         Optional<User> opUser = userRepository.findByUsername(loginRequestDTO.username());
@@ -103,4 +110,5 @@ public class AuthService implements IAuthService{
         logger.info("AuthService => login => User logged in successfully");
         return new AuthServiceResponse<>(HttpStatus.OK, "User logged in", loginResponseDTO);
     }
+    //endregion
 }

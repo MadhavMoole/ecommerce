@@ -28,6 +28,7 @@ public class AuthController {
         this.authService = authService;
     }
 
+    //region register controller
     @PostMapping("/register")
     public ResponseEntity<AuthServiceResponse<RegistrationResponseDTO>> registerUser(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
         try {
@@ -37,7 +38,9 @@ public class AuthController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    //endregion
 
+    //region login controller
     @PostMapping("/login")
     public ResponseEntity<AuthServiceResponse<LoginResponseDTO>> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
@@ -47,5 +50,6 @@ public class AuthController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    //endregion
 
 }
