@@ -1,5 +1,6 @@
 package org.example.ecommerce.database.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,6 +25,7 @@ public class User {
         @Column(name = "username", nullable = false, unique = true)
         private String username;
 
+        @JsonIgnore
         @Column(name = "password", nullable = false, length = 1000)
         private String password;
 
@@ -36,6 +38,7 @@ public class User {
         @Column(name = "last_name", nullable = false)
         private String lastname;
 
+        @JsonIgnore
         @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
         private List<Address> addresses = new ArrayList<>();
 
