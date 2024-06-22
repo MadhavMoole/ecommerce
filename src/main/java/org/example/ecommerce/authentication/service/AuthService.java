@@ -11,7 +11,7 @@ import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.repository.UserRepository;
 import org.example.ecommerce.utils.EncryptionService;
 import org.example.ecommerce.utils.JWTService;
-import org.example.ecommerce.utils.ValidatationService;
+import org.example.ecommerce.utils.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +51,12 @@ public class AuthService implements IAuthService{
     @Override
     public AuthServiceResponse<RegistrationResponseDTO> registerUser(RegistrationRequestDTO registrationRequestDTO) {
 
-        if(!ValidatationService.isValidEmail(registrationRequestDTO.email())) {
+        if(!ValidationService.isValidEmail(registrationRequestDTO.email())) {
             logger.error("AuthService => createUser => Error: Invalid Email");
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Invalid Email", null);
         }
 
-        if(!ValidatationService.isValidPassword(registrationRequestDTO.password())) {
+        if(!ValidationService.isValidPassword(registrationRequestDTO.password())) {
             logger.error("AuthService => createUser => Error: Invalid Password");
             return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "Invalid Password", null);
         }

@@ -30,7 +30,7 @@ public class OrderController {
     }
     //endregion
 
-    //region getOrdersByUserId
+    //region getOrdersByUserId controller
     @GetMapping
     public ResponseEntity<List<WebOrderResponseDTO>> getOrders(@AuthenticationPrincipal User user) {
         List<WebOrderResponseDTO> webOrders = orderService.getOrdersByUserId(user.getId());
