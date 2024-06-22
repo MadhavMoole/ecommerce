@@ -29,6 +29,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### sql ###
+DummyData.sql
+
 ### VS Code ###
 .vscode/
 
