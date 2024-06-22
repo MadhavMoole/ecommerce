@@ -56,7 +56,7 @@ public class AuthController {
     }
     //endregion
 
-    //region my-profile
+    //region my-profile controller
     @GetMapping("/my-profile")
     public ResponseEntity<AuthServiceResponse<MyProfileResponseDTO>> getMyProfile(@AuthenticationPrincipal User user) {
         AuthServiceResponse<MyProfileResponseDTO> myProfileResponse = authService.getMyProfile(user);

@@ -27,7 +27,7 @@ public class ProductController {
     }
     //endregion
 
-    //region getAllProducts
+    //region getAllProducts controller
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
         List<ProductResponseDTO> products = productService.getAllProducts();
