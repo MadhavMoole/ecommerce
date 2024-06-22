@@ -6,6 +6,7 @@ import org.example.ecommerce.authentication.model.Login.LoginRequestDTO;
 import org.example.ecommerce.authentication.model.Login.LoginResponseDTO;
 import org.example.ecommerce.authentication.model.Registration.RegistrationRequestDTO;
 import org.example.ecommerce.authentication.model.Registration.RegistrationResponseDTO;
+import org.example.ecommerce.authentication.model.myProfile.MyProfileResponseDTO;
 import org.example.ecommerce.authentication.service.AuthService;
 import org.example.ecommerce.authentication.service.IAuthService;
 import org.example.ecommerce.database.models.User;
@@ -57,8 +58,12 @@ public class AuthController {
 
     //region my-profile
     @GetMapping("/my-profile")
-    public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<AuthServiceResponse<MyProfileResponseDTO>> getMyProfile(@AuthenticationPrincipal User user) {
+        AuthServiceResponse<MyProfileResponseDTO> myProfileResponse = authService.getMyProfile(user);
+        if(myProfileResponse.status() != HttpStatus.OK) {
+            return new ResponseEntity<>(null, myProfileResponse.status());
+        }
+        return new ResponseEntity<>(myProfileResponse, myProfileResponse.status());
     }
     //endregion
 

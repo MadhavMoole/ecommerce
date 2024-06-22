@@ -6,6 +6,7 @@ import org.example.ecommerce.authentication.model.Login.LoginRequestDTO;
 import org.example.ecommerce.authentication.model.Login.LoginResponseDTO;
 import org.example.ecommerce.authentication.model.Registration.RegistrationRequestDTO;
 import org.example.ecommerce.authentication.model.Registration.RegistrationResponseDTO;
+import org.example.ecommerce.authentication.model.myProfile.MyProfileResponseDTO;
 import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.repository.UserRepository;
 import org.example.ecommerce.utils.EncryptionService;
@@ -31,6 +32,7 @@ public class AuthService implements IAuthService{
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     //endregion
 
+    //region di
     @Autowired
     public void setJwtUtil(JWTService jwtService) {
         this.jwtService = jwtService;
@@ -43,6 +45,7 @@ public class AuthService implements IAuthService{
 
     @Autowired
     public void setEncryptionService(EncryptionService encryptionService) {this.encryptionService = encryptionService;}
+    //endregion
 
     //region register
     @Override
@@ -109,6 +112,31 @@ public class AuthService implements IAuthService{
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwt, user.getUsername(), user.getEmail());
         logger.info("AuthService => login => User logged in successfully");
         return new AuthServiceResponse<>(HttpStatus.OK, "User logged in", loginResponseDTO);
+    }
+    //endregion
+
+    //region my-profile
+    @Override
+    public AuthServiceResponse<MyProfileResponseDTO> getMyProfile(User user) {
+        try {
+            Optional<User> userDTO = userRepository.findByUsername(user.getUsername());
+            if(userDTO.isPresent()) {
+                MyProfileResponseDTO profileResponseDTO = new MyProfileResponseDTO(
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getAddresses()
+                );
+                logger.info("AuthService => getMyProfile => User Data Found");
+                return new AuthServiceResponse<>(HttpStatus.OK, "User Data Found", profileResponseDTO);
+            }
+            logger.error("AuthService => getMyProfile => User not found");
+            return new AuthServiceResponse<>(HttpStatus.BAD_REQUEST, "User not found", null);
+        } catch (Exception e) {
+            logger.error("AuthService => getMyProfile => Error: {}", e.getMessage());
+            return new AuthServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), null);
+        }
     }
     //endregion
 }
