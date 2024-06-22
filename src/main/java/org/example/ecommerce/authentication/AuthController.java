@@ -20,12 +20,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
+    //region declaration
     private final IAuthService authService;
+    //endregion
 
+    //region di
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
+    //endregion
 
     //region register controller
     @PostMapping("/register")
@@ -51,9 +55,11 @@ public class AuthController {
     }
     //endregion
 
+    //region my-profile
     @GetMapping("/my-profile")
     public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal User user) {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+    //endregion
 
 }
