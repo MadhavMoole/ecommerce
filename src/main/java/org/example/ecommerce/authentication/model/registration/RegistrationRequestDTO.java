@@ -1,4 +1,4 @@
-package org.example.ecommerce.authentication.model.Registration;
+package org.example.ecommerce.authentication.model.registration;
 
 public record RegistrationRequestDTO(
         String firstname,

@@ -1,4 +1,4 @@
-package org.example.ecommerce.authentication.model.Login;
+package org.example.ecommerce.authentication.model.login;
 
 public record LoginResponseDTO(
         String jwt,
