@@ -37,6 +37,14 @@ public class JWTService {
                 .sign(algorithm);
     }
 
+    public String generateVerificationJWT(@Nonnull User user) {
+        return JWT.create()
+                .withClaim(USERNAME, user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * expiry)))
+                .withIssuer(issuer)
+                .sign(algorithm);
+    }
+
     public String getUsername(String jwt) {
         return JWT.decode(jwt).getClaim(USERNAME).asString();
     }

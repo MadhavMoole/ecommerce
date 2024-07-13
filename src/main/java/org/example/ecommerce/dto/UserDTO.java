@@ -12,8 +12,8 @@ public record UserDTO(
         return new UserDTO(
                 user.getUsername(),
                 user.getEmail(),
-                user.getFirstName(),
-                user.getLastName()
+                user.getfirstname(),
+                user.getLastname()
         );
     }
 }

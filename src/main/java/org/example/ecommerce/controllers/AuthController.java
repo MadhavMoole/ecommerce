@@ -1,6 +1,5 @@
 package org.example.ecommerce.controllers;
 
-import org.example.ecommerce.AuthServiceResponse;
 import org.example.ecommerce.dto.authentication.login.LoginRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginResponseDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
@@ -16,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/v1")
 public class AuthController {
 
     //region declaration
@@ -32,10 +31,10 @@ public class AuthController {
 
     //region register controller
     @PostMapping("/register")
-    public ResponseEntity<AuthServiceResponse<RegistrationResponseDTO>> registerUser(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
+    public ResponseEntity<RegistrationResponseDTO> registerUser(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
         try {
-            AuthServiceResponse<RegistrationResponseDTO> authServiceResponse = authService.registerUser(registrationRequestDTO);
-            return new ResponseEntity<>(authServiceResponse, authServiceResponse.status());
+            RegistrationResponseDTO authServiceResponse = authService.registerUser(registrationRequestDTO);
+            return new ResponseEntity<>(authServiceResponse, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -44,10 +43,10 @@ public class AuthController {
 
     //region login controller
     @PostMapping("/login")
-    public ResponseEntity<AuthServiceResponse<LoginResponseDTO>> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            AuthServiceResponse<LoginResponseDTO> authServiceResponse = authService.loginUser(loginRequestDTO);
-            return new ResponseEntity<>(authServiceResponse, authServiceResponse.status());
+            LoginResponseDTO authServiceResponse = authService.loginUser(loginRequestDTO);
+            return new ResponseEntity<>(authServiceResponse, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -56,12 +55,12 @@ public class AuthController {
 
     //region my-profile controller
     @GetMapping("/my-profile")
-    public ResponseEntity<AuthServiceResponse<MyProfileResponseDTO>> getMyProfile(@AuthenticationPrincipal User user) {
-        AuthServiceResponse<MyProfileResponseDTO> myProfileResponse = authService.getMyProfile(user);
-        if(myProfileResponse.status() != HttpStatus.OK) {
-            return new ResponseEntity<>(null, myProfileResponse.status());
+    public ResponseEntity<MyProfileResponseDTO> getMyProfile(@AuthenticationPrincipal User user) {
+        MyProfileResponseDTO myProfileResponse = authService.getMyProfile(user);
+        if(myProfileResponse != null) {
+            return new ResponseEntity<>(myProfileResponse, HttpStatus.OK);
         }
-        return new ResponseEntity<>(myProfileResponse, myProfileResponse.status());
+        return new ResponseEntity<>(myProfileResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     //endregion
 
