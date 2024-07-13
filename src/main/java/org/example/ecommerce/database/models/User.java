@@ -42,6 +42,17 @@ public class User {
         @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
         private List<Address> addresses = new ArrayList<>();
 
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<VerificationToken>  verificationTokens = new ArrayList<>();
+
+        public List<VerificationToken> getVerificationTokens() {
+                return verificationTokens;
+        }
+
+        public void setVerificationTokens(List<VerificationToken> verificationTokens) {
+                this.verificationTokens = verificationTokens;
+        }
+
         public List<Address> getAddresses() {
                 return addresses;
         }
@@ -50,19 +61,19 @@ public class User {
                 this.addresses = addresses;
         }
 
-        public String getLastName() {
+        public String getLastname() {
                 return lastname;
         }
 
-        public void setLastName(String lastname) {
+        public void setLastname(String lastname) {
                 this.lastname = lastname;
         }
 
-        public String getFirstName() {
+        public String getfirstname() {
                 return firstname;
         }
 
-        public void setFirstName(String firstname) {
+        public void setfirstname(String firstname) {
                 this.firstname = firstname;
         }
 
