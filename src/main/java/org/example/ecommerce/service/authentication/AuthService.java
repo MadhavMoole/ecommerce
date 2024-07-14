@@ -5,9 +5,13 @@ import org.example.ecommerce.dto.authentication.login.LoginResponseDTO;
 import org.example.ecommerce.dto.AddressDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
+import org.example.ecommerce.exception.EmailFailureException;
 import org.example.ecommerce.dto.authentication.myProfile.MyProfileResponseDTO;
 import org.example.ecommerce.database.models.User;
+import org.example.ecommerce.database.models.VerificationToken;
 import org.example.ecommerce.database.repository.UserRepository;
+import org.example.ecommerce.database.repository.VerificationTokenRepository;
+import org.example.ecommerce.service.EmailService;
 import org.example.ecommerce.service.EncryptionService;
 import org.example.ecommerce.service.JWTService;
 import org.example.ecommerce.service.ValidationService;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +30,12 @@ public class AuthService implements IAuthService{
 
     //region declaration
     private UserRepository userRepository;
+    private VerificationTokenRepository verificationTokenRepository;
     private EncryptionService encryptionService;
+
     private JWTService jwtService;
+    private EmailService emailService;
+
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     //endregion
 
@@ -43,11 +52,21 @@ public class AuthService implements IAuthService{
 
     @Autowired
     public void setEncryptionService(EncryptionService encryptionService) {this.encryptionService = encryptionService;}
+
+    @Autowired
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
+    }
+
+    @Autowired
+    public void setVerificationTokenRepository(VerificationTokenRepository verificationTokenRepository) {
+        this.verificationTokenRepository = verificationTokenRepository;
+    }
     //endregion
 
     //region register
     @Override
-    public RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO) {
+    public RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO) throws EmailFailureException {
 
         if(!ValidationService.isValidEmail(registrationRequestDTO.email())) {
             logger.error("AuthService => createUser => Error: Invalid Email");
@@ -76,7 +95,12 @@ public class AuthService implements IAuthService{
             user.setLastname(registrationRequestDTO.lastname());
             user.setEmail(registrationRequestDTO.email());
             user.setPassword(encryptionService.encrypt(registrationRequestDTO.password()));
+
+            VerificationToken verificationToken = createVerificationToken(user);
+            emailService.SendVerificationMail(verificationToken);
+            
             userRepository.save(user);
+            verificationTokenRepository.save(verificationToken);
 
             // Generate JWT token on registration
             String jwt = jwtService.generateJWT(user);
@@ -144,6 +168,15 @@ public class AuthService implements IAuthService{
             logger.error("AuthService => getMyProfile => Error: {}", e.getMessage());
             return null;
         }
+    }
+
+    private VerificationToken createVerificationToken(User user) {
+        VerificationToken token = new VerificationToken();
+        token.setToken(jwtService.generateVerificationJWT(user));
+        token.setCreatedTimestamp(new Timestamp(System.currentTimeMillis()));
+        token.setUser(user);
+        user.getVerificationTokens().add(token);
+        return token;
     }
     //endregion
 }
