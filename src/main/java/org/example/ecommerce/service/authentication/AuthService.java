@@ -6,6 +6,8 @@ import org.example.ecommerce.dto.AddressDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.UserAlreadyExistsException;
+import org.example.ecommerce.exception.UserNotFoundException;
 import org.example.ecommerce.dto.authentication.myProfile.MyProfileResponseDTO;
 import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.models.VerificationToken;
@@ -14,7 +16,6 @@ import org.example.ecommerce.database.repository.VerificationTokenRepository;
 import org.example.ecommerce.service.EmailService;
 import org.example.ecommerce.service.EncryptionService;
 import org.example.ecommerce.service.JWTService;
-import org.example.ecommerce.service.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,24 +69,14 @@ public class AuthService implements IAuthService{
     @Override
     public RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO) throws EmailFailureException {
 
-        if(!ValidationService.isValidEmail(registrationRequestDTO.email())) {
-            logger.error("AuthService => createUser => Error: Invalid Email");
-            return null;
-        }
-
-        if(!ValidationService.isValidPassword(registrationRequestDTO.password())) {
-            logger.error("AuthService => createUser => Error: Invalid Password");
-            return null;
-        }
-
         if(userRepository.findByUsername(registrationRequestDTO.username()).isPresent()) {
             logger.error("AuthService => createUser => Error: User Already exists");
-            return null;
+            throw new UserAlreadyExistsException("User Already Exists!");
         }
 
         if(userRepository.findByEmail(registrationRequestDTO.email()).isPresent()) {
             logger.error("AuthService => createUser => Error: Email Already taken");
-            return null;
+            throw new UserAlreadyExistsException("User Already Exists with this email!");
         }
 
         try {
@@ -163,7 +154,7 @@ public class AuthService implements IAuthService{
                 return profileResponseDTO;
             }
             logger.error("AuthService => getMyProfile => User not found");
-            return null;
+            throw new UserNotFoundException("User Not Found!");
         } catch (Exception e) {
             logger.error("AuthService => getMyProfile => Error: {}", e.getMessage());
             return null;
