@@ -47,10 +47,6 @@ public class VerificationToken {
         this.token = token;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getId() {
         return id;
     }
