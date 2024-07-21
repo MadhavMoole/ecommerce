@@ -68,7 +68,7 @@ public class AuthService implements IAuthService{
 
     //region register
     @Override
-    public RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO) throws EmailFailureException {
+    public RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO) throws EmailFailureException, UserAlreadyExistsException {
 
         if(userRepository.findByUsername(registrationRequestDTO.username()).isPresent()) {
             logger.error("AuthService => createUser => Error: User Already exists");
