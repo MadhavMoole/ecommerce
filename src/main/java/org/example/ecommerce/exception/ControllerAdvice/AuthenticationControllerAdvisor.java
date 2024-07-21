@@ -1,5 +1,6 @@
-package org.example.ecommerce.exception.ControllerAdvice;
+package org.example.ecommerce.exception.controlleradvice;
 
+import org.example.ecommerce.controllers.AuthController;
 import org.example.ecommerce.exception.EmailFailureException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
 import org.example.ecommerce.exception.UserNotFoundException;
@@ -8,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackageClasses = AuthController.class)
 public class AuthenticationControllerAdvisor {
     
     @ExceptionHandler(UserAlreadyExistsException.class)

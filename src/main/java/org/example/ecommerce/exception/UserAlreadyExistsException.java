@@ -1,6 +1,6 @@
 package org.example.ecommerce.exception;
 
-public class UserAlreadyExistsException extends RuntimeException{
+public class UserAlreadyExistsException extends Exception{
     
     private String message;
 

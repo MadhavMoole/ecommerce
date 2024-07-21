@@ -6,6 +6,7 @@ import org.example.ecommerce.dto.AddressDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.InvalidCredentialException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
 import org.example.ecommerce.exception.UserNotFoundException;
 import org.example.ecommerce.dto.authentication.myProfile.MyProfileResponseDTO;
@@ -108,17 +109,17 @@ public class AuthService implements IAuthService{
 
     //region login
     @Override
-    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
+    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) throws UserNotFoundException, InvalidCredentialException {
         Optional<User> opUser = userRepository.findByUsername(loginRequestDTO.username());
         if (opUser.isEmpty()) {
             logger.error("AuthService => login => Error: User not found");
-            return null;
+            throw new UserNotFoundException("User not found");
         }
 
         User user = opUser.get();
         if (!encryptionService.verifyPassword(loginRequestDTO.password(), user.getPassword())) {
             logger.error("AuthService => login => Error: Incorrect password");
-            return null;
+            throw new InvalidCredentialException("incorrect password");
         }
 
         String jwt = jwtService.generateJWT(user);
