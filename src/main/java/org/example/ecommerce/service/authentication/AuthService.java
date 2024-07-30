@@ -7,8 +7,10 @@ import org.example.ecommerce.dto.authentication.registration.RegistrationRequest
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
 import org.example.ecommerce.exception.InvalidCredentialException;
+import org.example.ecommerce.exception.TokenNotFoundException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
 import org.example.ecommerce.exception.UserNotFoundException;
+import org.example.ecommerce.exception.UserNotVerifiedException;
 import org.example.ecommerce.dto.authentication.myProfile.MyProfileResponseDTO;
 import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.models.VerificationToken;
@@ -20,8 +22,11 @@ import org.example.ecommerce.service.JWTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -37,6 +42,9 @@ public class AuthService implements IAuthService{
 
     private JWTService jwtService;
     private EmailService emailService;
+
+    @Value("${email.verification.timeout}")
+    private long timeout;
 
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     //endregion
@@ -109,7 +117,7 @@ public class AuthService implements IAuthService{
 
     //region login
     @Override
-    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) throws UserNotFoundException, InvalidCredentialException {
+    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) throws UserNotFoundException, InvalidCredentialException, EmailFailureException, UserNotVerifiedException {
         Optional<User> opUser = userRepository.findByUsername(loginRequestDTO.username());
         if (opUser.isEmpty()) {
             logger.error("AuthService => login => Error: User not found");
@@ -122,6 +130,17 @@ public class AuthService implements IAuthService{
             throw new InvalidCredentialException("incorrect password");
         }
 
+        if(!user.isEmailVerified()) {
+            List<VerificationToken> verificationTokens = user.getVerificationTokens();
+            boolean resendVerification = verificationTokens.size() == 0 || verificationTokens.get(0).getCreatedTimestamp().before(new Timestamp(System.currentTimeMillis() - timeout));
+            if(resendVerification) {
+                var token = createVerificationToken(user);
+                verificationTokenRepository.save(token);
+                emailService.SendVerificationMail(token);
+            }
+            throw new UserNotVerifiedException("User Not Verified, resending token");
+        }
+
         String jwt = jwtService.generateJWT(user);
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwt, user.getUsername(), user.getEmail());
         logger.info("AuthService => login => User logged in successfully");
@@ -131,7 +150,7 @@ public class AuthService implements IAuthService{
 
     //region my-profile
     @Override
-    public MyProfileResponseDTO getMyProfile(User user) {
+    public MyProfileResponseDTO getMyProfile(User user) throws UserNotFoundException {
         try {
             Optional<User> userDTO = userRepository.findByUsername(user.getUsername());
             if(userDTO.isPresent()) {
@@ -158,7 +177,7 @@ public class AuthService implements IAuthService{
             throw new UserNotFoundException("User Not Found!");
         } catch (Exception e) {
             logger.error("AuthService => getMyProfile => Error: {}", e.getMessage());
-            return null;
+            throw new UserNotFoundException(e.getMessage());
         }
     }
 
@@ -169,6 +188,25 @@ public class AuthService implements IAuthService{
         token.setUser(user);
         user.getVerificationTokens().add(token);
         return token;
+    }
+    //endregion
+
+    //region verify-user 
+    @Override
+    @Transactional
+    public Boolean verifyUser(String token) throws TokenNotFoundException {
+        var opToken = verificationTokenRepository.findByToken(token);
+        if(opToken.isPresent()) {
+            VerificationToken verificationToken = opToken.get();
+            User user = verificationToken.getUser();
+            if(!user.isEmailVerified()) {
+                user.setEmailVerified(true);
+                userRepository.save(user);
+                verificationTokenRepository.deleteByUser(user);
+                return true;
+            }
+        }
+        throw new TokenNotFoundException("No Token Found");
     }
     //endregion
 }
