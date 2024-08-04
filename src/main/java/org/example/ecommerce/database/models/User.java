@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 import java.util.ArrayList;
@@ -43,8 +44,28 @@ public class User {
         private List<Address> addresses = new ArrayList<>();
 
         @JsonIgnore
+        @OrderBy("id desc")
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<VerificationToken>  verificationTokens = new ArrayList<>();
+
+        @Column(name="email_verified", nullable = false)
+        private boolean isEmailVerified = false;
+
+        public String getFirstname() {
+                return firstname;
+        }
+
+        public void setFirstname(String firstname) {
+                this.firstname = firstname;
+        }
+
+        public boolean isEmailVerified() {
+                return isEmailVerified;
+        }
+
+        public void setEmailVerified(boolean isEmailVerified) {
+                this.isEmailVerified = isEmailVerified;
+        }
 
         public List<VerificationToken> getVerificationTokens() {
                 return verificationTokens;
@@ -104,9 +125,5 @@ public class User {
 
         public Long getId() {
                 return id;
-        }
-
-        public void setId(Long id) {
-                this.id = id;
         }
 }

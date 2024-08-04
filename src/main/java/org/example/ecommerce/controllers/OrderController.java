@@ -31,9 +31,6 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<WebOrderResponseDTO>> getOrders(@AuthenticationPrincipal User user) {
         List<WebOrderResponseDTO> webOrders = orderService.getOrdersByUserId(user.getId());
-        if (webOrders.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(webOrders);
     }
     //endregion

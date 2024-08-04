@@ -33,7 +33,7 @@ public class EmailService {
         SimpleMailMessage message = makeSimpleMailMessage();
         message.setTo(verificationToken.getUser().getEmail());
         message.setSubject("Verify your email account");
-        var text = String.format("Please follow the link below to verify your email. \n {}/auth/verify?token={}", url, verificationToken.getToken());
+        var text = String.format("Please follow the link below to verify your email. \n "+ url + "/auth/verify?token="+verificationToken.getToken());
         message.setText(text);
 
         try{

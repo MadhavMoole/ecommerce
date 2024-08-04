@@ -1,6 +1,6 @@
 package org.example.ecommerce.exception;
 
-public class UserNotFoundException extends RuntimeException{
+public class UserNotFoundException extends Exception{
     private String message;
 
     public UserNotFoundException() {}
