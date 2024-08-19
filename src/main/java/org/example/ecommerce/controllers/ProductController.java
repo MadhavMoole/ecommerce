@@ -2,6 +2,7 @@ package org.example.ecommerce.controllers;
 
 import org.example.ecommerce.dto.ProductDTO;
 import org.example.ecommerce.dto.product.ProductResponseDTO;
+import org.example.ecommerce.exception.ProductNotFoundException;
 import org.example.ecommerce.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ProductController {
 
     //region getAllProducts controller
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() throws ProductNotFoundException {
         List<ProductResponseDTO> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
@@ -37,7 +38,7 @@ public class ProductController {
 
     //region getProductById controller
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable("id") Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
         var productDTO = productService.getProductById(id);
         return ResponseEntity.ok(productDTO);
     }

@@ -2,6 +2,8 @@ package org.example.ecommerce.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import org.example.ecommerce.database.models.User;
@@ -23,6 +25,8 @@ public class JWTService {
     private long expiry;
     private Algorithm algorithm;
     private static final String USERNAME = "USERNAME";
+    private static final String EMAIL = "EMAIL";
+    private static final String RESET_PASSWORD = "RESET_PASSWORD";
 
     @PostConstruct
     public void init() {
@@ -32,6 +36,7 @@ public class JWTService {
     public String generateJWT(@Nonnull User user) {
         return JWT.create()
                 .withClaim(USERNAME, user.getUsername())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * expiry)))
                 .withIssuer(issuer)
                 .sign(algorithm);
@@ -39,13 +44,29 @@ public class JWTService {
 
     public String generateVerificationJWT(@Nonnull User user) {
         return JWT.create()
-                .withClaim(USERNAME, user.getUsername())
+                .withClaim(EMAIL, user.getEmail())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * expiry)))
                 .withIssuer(issuer)
                 .sign(algorithm);
     }
 
-    public String getUsername(String jwt) {
-        return JWT.decode(jwt).getClaim(USERNAME).asString();
+    public String generatePasswordJWT(@Nonnull User user) {
+        return JWT.create()
+                .withClaim(RESET_PASSWORD, user.getEmail())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * 60 * 15)))
+                .withIssuer(issuer)
+                .sign(algorithm);
+    }
+
+    public String getResetPasswordEmail(String token) {
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token); 
+        return jwt.getClaim(RESET_PASSWORD).asString();
+    }
+
+    public String getUsername(String token) {
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token); 
+        return jwt.getClaim(USERNAME).asString();
     }
 }

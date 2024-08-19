@@ -1,11 +1,13 @@
 package org.example.ecommerce.service.authentication;
 
+import org.example.ecommerce.dto.authentication.ResetPasswordRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginResponseDTO;
 import org.example.ecommerce.dto.AddressDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.EmailNotFoundException;
 import org.example.ecommerce.exception.InvalidCredentialException;
 import org.example.ecommerce.exception.TokenNotFoundException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
@@ -196,6 +198,7 @@ public class AuthService implements IAuthService{
     @Transactional
     public Boolean verifyUser(String token) throws TokenNotFoundException {
         var opToken = verificationTokenRepository.findByToken(token);
+        
         if(opToken.isPresent()) {
             VerificationToken verificationToken = opToken.get();
             User user = verificationToken.getUser();
@@ -206,7 +209,41 @@ public class AuthService implements IAuthService{
                 return true;
             }
         }
+
         throw new TokenNotFoundException("No Token Found");
+    }
+    //endregion
+
+    //region forgot-password
+    @Override
+    public String forgotPassword(String email) throws EmailNotFoundException, EmailFailureException {
+        Optional<User> opUser = userRepository.findByEmail(email);
+        
+        if(opUser.isPresent()) {
+            User user = opUser.get();
+            String token = jwtService.generatePasswordJWT(user);
+            emailService.sendPasswordResetEmail(user, token);
+            return "Password Reset Link Sent";
+        } else {
+            throw new EmailNotFoundException("No Matching Email Found");
+        }
+    }
+    //endregion
+
+    //region reset-password
+    @Override
+    public String resetPassword(ResetPasswordRequestDTO passwordRequestDTO) throws UserNotFoundException {
+       String email = jwtService.getResetPasswordEmail(passwordRequestDTO.token());
+       Optional<User> opUser = userRepository.findByEmail(email);
+
+       if(opUser.isPresent()) {
+            User user = opUser.get();
+            user.setPassword(encryptionService.encrypt(passwordRequestDTO.password()));
+            userRepository.save(user);
+            return "Password Reset Successful";
+       } else {
+            throw new UserNotFoundException("No User found with this email");
+       }
     }
     //endregion
 }
