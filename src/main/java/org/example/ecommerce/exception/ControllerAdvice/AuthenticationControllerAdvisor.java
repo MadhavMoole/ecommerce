@@ -2,6 +2,7 @@ package org.example.ecommerce.exception.controlleradvice;
 
 import org.example.ecommerce.controllers.AuthController;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.EmailNotFoundException;
 import org.example.ecommerce.exception.InvalidCredentialException;
 import org.example.ecommerce.exception.TokenNotFoundException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
@@ -47,6 +48,11 @@ public class AuthenticationControllerAdvisor {
 
     @ExceptionHandler(TokenNotFoundException.class)
     public ResponseEntity<String> handleTokenNotFoundException(TokenNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<String> handleEmailNotFoundException(EmailNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

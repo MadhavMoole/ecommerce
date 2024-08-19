@@ -1,5 +1,6 @@
 package org.example.ecommerce.service;
 
+import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.database.models.VerificationToken;
 import org.example.ecommerce.exception.EmailFailureException;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,19 @@ public class EmailService {
         message.setText(text);
 
         try{
+            javaMailSender.send(message);
+        } catch (MailException e) {
+            throw new EmailFailureException();
+        }
+    }
+
+    public void sendPasswordResetEmail(User user, String token) throws EmailFailureException {
+        SimpleMailMessage message = makeSimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Password Reset Request Link");
+        message.setText("Link to Reset your password: " + url + "/auth/v1/reset-password?token=" + token);
+
+        try {
             javaMailSender.send(message);
         } catch (MailException e) {
             throw new EmailFailureException();

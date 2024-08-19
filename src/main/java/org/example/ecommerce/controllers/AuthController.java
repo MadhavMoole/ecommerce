@@ -1,10 +1,12 @@
 package org.example.ecommerce.controllers;
 
+import org.example.ecommerce.dto.authentication.ResetPasswordRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginResponseDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.EmailNotFoundException;
 import org.example.ecommerce.exception.InvalidCredentialException;
 import org.example.ecommerce.exception.TokenNotFoundException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
@@ -16,11 +18,15 @@ import org.example.ecommerce.service.authentication.IAuthService;
 import org.example.ecommerce.database.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import jakarta.validation.Valid;
+
 
 
 @RestController
@@ -70,5 +76,20 @@ public class AuthController {
         }
         return new ResponseEntity<String>("ERROR OCCURED", HttpStatus.CONFLICT);
     }
+    //endregion
+
+    //region forgot-password controller
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotMyPassword(@RequestBody String email) throws EmailNotFoundException, EmailFailureException {
+       return new ResponseEntity<String>(authService.forgotPassword(email), HttpStatus.ACCEPTED);  
+    }
+    //endregion
+
+    //region reset-password controller
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> postMethodName(@Valid @RequestBody ResetPasswordRequestDTO passwordRequestDTO) throws UserNotFoundException {
+        return new ResponseEntity<String>(authService.resetPassword(passwordRequestDTO), HttpStatus.OK);
+    }
+    
     //endregion
 }

@@ -1,6 +1,8 @@
 package org.example.ecommerce.security;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+
+import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +37,10 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+        @NonNull HttpServletRequest request, 
+        @NonNull HttpServletResponse response, 
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("x-auth-token");
         if (header != null && header.startsWith("Bearer ")) {
             String jwtToken = header.substring(7);

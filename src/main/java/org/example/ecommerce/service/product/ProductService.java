@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +29,7 @@ public class ProductService implements IProductService{
 
     //region getAllProducts
     @Override
-    public List<ProductResponseDTO> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() throws ProductNotFoundException {
         try {
             List<Product> products = productRepository.findAll();
             if (!products.isEmpty()) {
@@ -44,14 +43,14 @@ public class ProductService implements IProductService{
 
         } catch (Exception e) {
             logger.error("ProductService => getAllProducts() => Error {}", e.getMessage());
+            throw new ProductNotFoundException("No Products Found!");
         }
-        return new ArrayList<>();
     }
     //endregion
 
     //region getProductById
     @Override
-    public ProductDTO getProductById(Long id) {
+    public ProductDTO getProductById(Long id) throws ProductNotFoundException {
         try {
             var opProduct = productRepository.findById(id);
             if(opProduct.isEmpty()) {
@@ -69,7 +68,7 @@ public class ProductService implements IProductService{
         } catch (Exception e) {
             logger.error("ProductService => getProductById() => Error: {}", e);
         }
-        return new ProductDTO(null, null, null, 0);
+        throw new ProductNotFoundException("Product Not Found");
     }
     //endregion
 }

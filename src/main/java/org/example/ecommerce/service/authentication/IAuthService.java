@@ -1,10 +1,12 @@
 package org.example.ecommerce.service.authentication;
 
+import org.example.ecommerce.dto.authentication.ResetPasswordRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginRequestDTO;
 import org.example.ecommerce.dto.authentication.login.LoginResponseDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationRequestDTO;
 import org.example.ecommerce.dto.authentication.registration.RegistrationResponseDTO;
 import org.example.ecommerce.exception.EmailFailureException;
+import org.example.ecommerce.exception.EmailNotFoundException;
 import org.example.ecommerce.exception.InvalidCredentialException;
 import org.example.ecommerce.exception.TokenNotFoundException;
 import org.example.ecommerce.exception.UserAlreadyExistsException;
@@ -18,4 +20,6 @@ public interface IAuthService {
     LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) throws UserNotFoundException, InvalidCredentialException, EmailFailureException, UserNotVerifiedException;
     MyProfileResponseDTO getMyProfile(User user) throws UserNotFoundException;
     Boolean verifyUser(String token) throws TokenNotFoundException;
+    String forgotPassword(String email) throws EmailNotFoundException, EmailFailureException;
+    String resetPassword(ResetPasswordRequestDTO passwordRequestDTO) throws UserNotFoundException;
 }
