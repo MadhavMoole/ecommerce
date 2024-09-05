@@ -3,17 +3,13 @@ package org.example.ecommerce.controllers;
 import java.util.List;
 
 import org.example.ecommerce.database.models.Address;
-import org.example.ecommerce.database.models.User;
 import org.example.ecommerce.exception.NoAddressFoundException;
 import org.example.ecommerce.service.address.AddressService;
 import org.example.ecommerce.service.address.IAddressService;
-import org.example.ecommerce.service.authentication.AuthService;
-import org.example.ecommerce.service.authentication.IAuthService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
