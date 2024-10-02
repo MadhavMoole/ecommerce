@@ -15,14 +15,9 @@ import java.util.Date;
 @Service
 public class JWTService {
 
-    @Value("${jwt.algorithm.key}")
-    private String key;
-
-    @Value("${jwt.issuer}")
-    private String issuer;
-
-    @Value("${jwt.expiry}")
-    private long expiry;
+    private String key = "SuperSecureSecretKey";
+    private String issuer = "eCommerce";
+    private long expiry = 86400;
     private Algorithm algorithm;
     private static final String USERNAME = "USERNAME";
     private static final String EMAIL = "EMAIL";

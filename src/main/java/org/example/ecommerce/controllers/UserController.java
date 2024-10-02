@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/user/v1")
 public class UserController {
     
-    private IAddressService addressService;
+    private final IAddressService addressService;
 
     public UserController(AddressService addressService) {
         this.addressService = addressService;
@@ -38,7 +38,6 @@ public class UserController {
     public ResponseEntity<Address> putAddress(@PathVariable Long userId, @RequestBody Address address) {
         return new ResponseEntity<Address>(addressService.putAddress(userId, address), HttpStatus.ACCEPTED);
     }
-    
 
     @PatchMapping("/{userId}/address")
     public ResponseEntity<Address> updateAddress(@PathVariable Long userId, @RequestBody Address address) throws NoAddressFoundException {

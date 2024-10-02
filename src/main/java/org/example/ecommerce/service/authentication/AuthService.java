@@ -45,8 +45,7 @@ public class AuthService implements IAuthService{
     private JWTService jwtService;
     private EmailService emailService;
 
-    @Value("${email.verification.timeout}")
-    private long timeout;
+    private long timeout = 3600000;
 
     private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     //endregion
@@ -65,7 +64,6 @@ public class AuthService implements IAuthService{
     @Autowired
     public void setEncryptionService(EncryptionService encryptionService) {this.encryptionService = encryptionService;}
 
-    @Autowired
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
     }
