@@ -7,7 +7,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import org.example.ecommerce.database.models.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -63,5 +62,14 @@ public class JWTService {
     public String getUsername(String token) {
         DecodedJWT jwt = JWT.require(algorithm).build().verify(token); 
         return jwt.getClaim(USERNAME).asString();
+    }
+
+    public boolean isValid(String token) {
+        try {
+            JWT.require(algorithm).build().verify(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
